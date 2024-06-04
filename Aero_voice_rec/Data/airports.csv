@@ -1,0 +1,32 @@
+Name,Latitude,Longitude,Code,feed_type,PLS_link
+Budapest Ferenc Liszt International Airport,47.43690109,19.25559998,BUD,LHBP Approach,http://d.liveatc.net/lhbp_app2
+John F. Kennedy International Airport,40.63980103,-73.77890015,JFK,ARINC (JFK/LGA Area),http://d.liveatc.net/kjfk_arinc
+Logan International Airport,42.36429977,-71.00520325,BOS,KBOS App (Final Vector),http://d.liveatc.net/kbos_final
+Salgado Filho International Airport,-29.994428,-51.171428,POA,SBPA Gnd/Twr/App/Center,http://d.liveatc.net/sbpa2
+Tokyo International Airport (Haneda),35.552299,139.779999,HND,RJTT App/Dep,http://d.liveatc.net/rjtt_app_dep
+Narita International Airport,35.7647018,140.3860016,NRT,RJAA Approach,http://d.liveatc.net/rjaa_app_s
+Los Angeles International Airport,33.941589,-118.408530,LAX,KLAX App (East Feeder),http://d.liveatc.net/kpoc2_klax_app_east_feeder
+Zurich Airport,47.464722,8.549167,ZRH,LSZH Approach (East),http://d.liveatc.net/lszh1_app_east
+Minneapolis-Saint Paul International Airport,44.88192,-93.22197,MSP,KMSP Approach (121.2),http://d.liveatc.net/kmsp3_app_121200
+Hong Kong International Airport,22.3080,113.9185,HKG,VHHH App/Dep/Dir/Zone,http://d.liveatc.net/vhhh5 
+Amsterdam Airport Schiphol,52.3105,4.7683,AMS,Dutch Mil Radar,http://d.liveatc.net/ehle_dutchmil
+San Francisco International Airport,37.61882,-122.3758,SFO,KSFO Company Channels,http://d.liveatc.net/ksfo_co
+Portsmouth International Airport at Pease,43.0779,-70.8233,PSM,KPSM Gnd/Twr/App/GCA,http://d.liveatc.net/kpsm
+Denver International Airport,39.8561,-104.6737,DEN,KDEN Approach,http://d.liveatc.net/kden1_1
+Reno-Tahoe International Airport,39.4991,-119.7681,RNO,KRNO Clearance Delivery,http://d.liveatc.net/krno1_del
+Norman Y. Mineta San José International Airport,37.3639,-121.9289,SJC,KSJC D-ATIS,http://d.liveatc.net/ksjc_atis
+Taipei Songshan Airport,25.0683,121.5510,TSA,RCSS Tower/App/Dep,http://d.liveatc.net/rcss2
+Daniel K. Inouye International Airport,21.3245,-157.9251,HNL,HCF Center (Mt. Kaala/119.9),http://d.liveatc.net/phnl1_hcf_119900
+O'Hare International Airport,41.9742,-87.9073,ORD,KORD App (10R/28C),http://d.liveatc.net/kord5
+Toronto Pearson International Airport,43.6777,-79.6248,YYZ,CYYZ Apron,http://d.liveatc.net/cyyz9
+Fort Lauderdale-Hollywood International Airport,26.0726,-80.1527,FLL,KFLL App (Final),http://d.liveatc.net/kfll1_final
+Orlando International Airport,28.4312,-81.3080,MCO,KMCO App/Dep (120.15),http://d.liveatc.net/korl_kmco_app_120150
+Québec City Jean Lesage International Airport,46.7911,-71.3933,YQB,CYQB App/Dep (Terminal/124.0),http://d.liveatc.net/cyqb1_app_124000
+Melbourne Airport,-37.6690,144.8410,MEL,YMML Twr/App/Center,http://d.liveatc.net/ymml3
+Washington Dulles International Airport,38.9534,-77.4477,IAD,KIAD App (Final Center),http://d.liveatc.net/kiad1_7
+Kodiak Airport,57.749967,-152.493856,ADQ,PADQ Gnd/Twr/ZAN,http://d.liveatc.net/padq
+Philadelphia International Airport,39.8719,-75.2411,PHL,KPHL App (Final),http://d.liveatc.net/kphl_final
+Homer Airport,59.6456,-151.4766,HOM,PAHO AWOS/AFIS,http://d.liveatc.net/paho1_awos
+Chico Municipal Airport,39.7954,-121.8584,CIC,KCIC Tower/ZOA42,http://d.liveatc.net/kcic1
+James Armstrong Richardson International Airport,49.9100,-97.2339,YWG,CYWG App/Dep,http://d.liveatc.net/cywg2_misc1
+Pierre Elliott Trudeau International Airport,45.4706,-73.7408,YUL,CYUL Approach/Departure,http://d.liveatc.net/cyul_app

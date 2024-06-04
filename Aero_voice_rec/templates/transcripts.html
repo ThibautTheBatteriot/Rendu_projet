@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Transcripts of {{airport_name}}</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+    <style>
+        #header {
+            height: 20px; /* Hauteur fixe pour le titre / Fixed height for the title */
+            background-color: #f0f0f0; /* Couleur de fond / Background color */
+            padding: 10px;
+            font-size: 24px;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            display: flex; /* Ajout pour alignement / Added for alignment */
+            align-items: center; /* Centre verticalement le contenu / Vertically centers the content */
+        }
+        #logo_ecoute {
+            cursor: pointer; /* Change le curseur pour indiquer un clic possible / Change the cursor to indicate a possible click */
+            height: 18px;
+            width: 18px;
+            margin-right: 15px; /* Espace entre le logo et le titre / Space between the logo and the title */
+        }
+        #logo_record {
+            cursor: pointer; /* Change le curseur pour indiquer un clic possible / Change the cursor to indicate a possible click */
+            height: 18px;
+            width: 18px;
+            margin-right: 15px; /* Espace entre le logo et le titre / Space between the logo and the title */
+        }
+        #messages {
+            height: calc(100vh - 60px); /* Hauteur restante / Remaining height */
+            overflow-y: auto; /* Permettre le défilement / Allow scrolling */
+            background-color: #fff;
+            padding: 10px;
+            font-family: Arial, sans-serif;
+        }
+        .message {
+            border-bottom: 1px solid #ccc;
+            padding: 8px;
+            margin-bottom: 5px;
+        }
+        .speaker-icon {
+        cursor: pointer;
+        width: 15px;
+        height: 15px;
+        margin-left: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header">
+        <img id="logo_ecoute" src="/templates/img/speaker.png" alt="Écouteurs">
+        <img id="logo_record" src="/templates/img/record_start.png" alt="start recording">
+        <div>Transcripts of <b>{{ airport_name }}</b></div>
+    </div>
+
+    <div id="messages"></div>
+
+    <script>
+        // Fonction pour jouer l'audio / Function to play audio
+        function playAudio(audioSrc) {
+            var audio = new Audio(audioSrc);
+            audio.play();
+        }
+        $(document).ready(function() {
+            var airport_name   = "{{ airport_name }}";
+            var pls_link       = "{{ pls_link }}";
+            var pls_link_parts = pls_link.split('/');
+            var file_name      = pls_link_parts[pls_link_parts.length - 1];
+            ///ajout : detecte si transcribe or not / add: detect if transcribe or not
+            var targetAirport = airports.find(airport => airport.PLS_link === pls_link); // Utilisez find pour obtenir directement l'objet correspondant / Use find to directly obtain the corresponding object
+            if (targetAirport) {
+                var being_transcripted = targetAirport.being_transcripted;
+            }
+            else {
+                var being_transcripted = 0
+            }
+
+            // Fonction pour mettre à jour l'icône au chargement de la page si la transcription est active/ Function to update the icon when the page loads if the transcription is active
+            function updateIconOnLoad() {
+                var $logoRecord = $('#logo_record');
+                if (being_transcripted == 1) {
+                    $logoRecord.attr('src', '/templates/img/record_pause.png');
+                }
+            }
+
+            // Appel de la fonction au chargement de la page / Call the function when the page loads
+            updateIconOnLoad();
+
+            function addSpeakerMarker(){
+                //var targetAirport = airports.find(airport => airport.PLS_link === pls_link); // Utilisez find pour obtenir directement l'objet correspondant / Use find to directly obtain the corresponding object
+                if (targetAirport) {
+                    var lat = parseFloat(targetAirport.Latitude);
+                    var lng = parseFloat(targetAirport.Longitude);
+                    if (!isNaN(lat) && !isNaN(lng)) {
+                        if (marker_speaker) {
+                            // Déplace le marqueur existant à la nouvelle position / Move the existing marker to the new position
+                            marker_speaker.setLatLng([lat, lng]);
+                        } else {
+                            // Crée un nouveau marqueur si aucun n'existe / Create a new marker if none exists
+                            marker_speaker = L.marker([lat, lng], {icon: speakerIcon}).addTo(map);
+                        }
+                        // Vous pouvez ajouter des options pour votre marqueur ici, par exemple un icône différent pour indiquer que c'est actif / You can add options for your marker here, for example a different icon to indicate it is active
+                    }
+                }
+            }
+            function loadPlayer() {
+                var airport_name_encoded = encodeURIComponent(airport_name);
+                var pls_link_encoded     = encodeURIComponent(pls_link);
+
+                var media_player_url = "/media_player?name=" + airport_name_encoded + "&pls_link=" + pls_link_encoded;
+                $("#media_player").empty();
+                $('#media_player').load(media_player_url);
+                addSpeakerMarker()
+            }
+
+
+            $('#logo_ecoute').click(function() {
+                var audioPlayer = document.getElementById('player');  // Obtenir le lecteur audio par son ID / Get the audio player by its ID
+                if (audioPlayer) {
+                    if(audioPlayer.src !== pls_link) {
+                        // Pause le lecteur audio 
+                        // Pause the audio player
+                        audioPlayer.pause();
+                        // Optionnel : Réinitialiser la source pour libérer les ressources
+                        // Optional: Reset the source to free up resources
+                        audioPlayer.src = '';
+                        
+                        loadPlayer();
+                    }
+                    else {
+                        //Player de cette source deja loaded - on ne fait rien pour eviter le rechargement
+                        // Player from this source already loaded - we do nothing to avoid reloading
+                    }
+                }
+                else {
+                    loadPlayer()
+                }
+            });
+
+            $('#logo_record').click(function() {
+                var pls_link_encoded     = encodeURIComponent(pls_link);
+                var currentSrc = $(this).attr('src');
+                if (currentSrc === '/templates/img/record_pause.png') {
+                    $(this).attr('src', '/templates/img/record_start.png');
+                    var to_do = '?to_do=stop_transcribe._.'+ pls_link_encoded;
+                    markers[pls_link].setIcon(blueBoldIcon);
+                    being_transcripted = 0; // Met à jour la variable localement / Update the variable locally
+                    initMessageWindows()
+                } else if (currentSrc === '/templates/img/record_start.png') {
+                    $(this).attr('src', '/templates/img/record_pause.png');
+                    var to_do = '?to_do=start_transcribe._.'+ pls_link_encoded;
+                    markers[pls_link].setIcon(redBoldIcon);
+                    being_transcripted = 1; // Met à jour la variable localement / Update the variable locally
+                    initMessageWindows()
+                }
+                if (targetAirport) {
+                    targetAirport.being_transcripted = being_transcripted;
+                }
+
+                // Envoie une requête AJAX pour appeler la fonction sur le serveur / Send an AJAX request to call the function on the server
+                $.ajax({
+                    url: '/manage_current_transcribes_url'+to_do,
+                    method: 'GET',
+                    success: function(response) {
+                        console.log(response); // Affiche la réponse du serveur / Display the server's response
+                    },
+                    error: function(error) {
+                        console.error('Error calling function:', error);
+                    }
+                });
+            });
+
+
+
+            function loadMessages() {
+                $.ajax({
+                    url: "/templates/transcripts/" + file_name + ".csv",
+                    dataType: "text",
+                    success: function(data) {
+                        $('#messages').empty();
+                        var lines = data.split("\n");
+                        lines.forEach(function(line) {
+                            var parts = line.split(",");
+                            if (parts.length >= 3) {
+                                var message_line = '<div class="message"><strong>' + parts[0] + ':</strong>';
+                                message_line += '<img src="/templates/img/speaker.png" alt="Play Audio" class="speaker-icon" onclick="playAudio(\'' + parts[1] + '\')">';
+                                message_line += ' ' + parts[2] + '</div>';
+                                $('#messages').append(message_line);
+                            }
+                        });
+                    }
+                });
+            }
+            function startInterval() {
+                if (intervalID !== null) {
+                    clearInterval(intervalID); // Arrêtez l'intervalle précédent / Stop the previous interval
+                }
+                intervalID = setInterval(loadMessages, 1000); // Démarrez un nouvel intervalle / Start a new interval
+            }
+
+            function initMessageWindows(){
+                if(being_transcripted) {
+                    startInterval(); // Démarrez l'intervalle lorsque la page est chargée / Start the interval when the page loads
+                    // Fonction pour arrêter l'intervalle lorsque la page est sur le point d'être quittée / Function to stop the interval when the page is about to be left
+                    window.onbeforeunload = function() {
+                        clearInterval(intervalID);
+                    };
+                }
+                else {
+                    if (intervalID !== null) {
+                    clearInterval(intervalID); // Arrêtez l'intervalle précédent / Stop the previous interval
+                    }
+                    loadMessages()
+                }
+            }
+            initMessageWindows()
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                if (marker_speaker) {
+                    map.removeLayer(marker_speaker);
+                }
+                marker_speaker = L.marker([lat, lng], {icon: speakerIcon}).addTo(map); // Supposant que 'map' est votre objet carte Leaflet défini globalement / Assuming 'map' is your globally defined Leaflet map object
+                // Vous pouvez ajouter des options pour votre marqueur ici, par exemple un icône différent pour indiquer que c'est actif / You can add options for your marker here, for example a different icon to indicate it is active
+            }
+            
+
+        });
+    </script>
+</body>
+</html>

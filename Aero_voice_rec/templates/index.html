@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Interface de Transcription / Transcription Interface</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/templates/img/pins.js"></script>
+
+    <style>
+        #mapid { height: 50vh; width: 100%; }
+        #media_player { height: 5vh; width: 100%; background-color: black; }
+        #transcript { height: 45vh; overflow-y: auto; }
+        button { margin: 10px; }
+    </style>
+</head>
+
+<body>
+    <div id="mapid"></div>
+    <div id="media_player"></div>
+    <div id="transcript"></div>
+
+    <script>
+        var selectedMarker = null;
+        var marker_speaker = null;
+        var markers = {};
+        var intervalID = null; //servira a identifier la boucle de rafraichissement pour la kill lors du changement d'aéroport / will be used to identify the refresh loop to kill it when changing airport
+
+        //code pour la map / code for the map
+        var map = L.map('mapid').setView([48.8566, 2.3522], 5); // Zoom sur l'Europe / Zoom on Europe
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19
+        }).addTo(map);
+    
+        var airports = {{ airports|tojson }};
+        console.log(airports);  // Vérifiez si les données sont présentes / Check if the data is present
+    
+        airports.forEach(function(airport) {
+            var name = airport.Name;
+            var code = airport.Code;
+            var PLS_link = airport.PLS_link;
+            var feed_type = airport.feed_type;
+            var being_transcripted = airport.being_transcripted;
+            var lat = parseFloat(airport.Latitude);
+            var lng = parseFloat(airport.Longitude);
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                if(being_transcripted) {
+                    var icon_type = redIcon;
+                }
+                else {
+                    var icon_type = blueIcon;
+                }
+                var marker = L.marker([lat, lng], {icon: icon_type}).addTo(map)
+                .bindPopup("<b><center>[" + code + "]" + name + "</b><br>" + feed_type + "</center>");
+
+                markers[PLS_link] = marker;
+
+                // Ajouter des écouteurs d'événements pour gérer les popups au survol / Add event listeners to handle popups on hover
+                marker.on('mouseover', function(e) {
+                    this.openPopup();
+                });
+                marker.on('mouseout', function(e) {
+                    this.closePopup();
+                });
+                // Gérer les clics sur les marqueurs pour changer le contenu de 'transcript' / Handle clicks on markers to change the content of 'transcript'
+                marker.on('click', onMarkerClick);
+                marker.on('click', function(e) {
+                    
+                    var name_encoded     = encodeURIComponent(name);
+                    var PLS_link_encoded = encodeURIComponent(PLS_link);
+
+                    //var transcript_url = "/transcripts?name=" + name + "&pls_link=" + last_part
+                    var transcript_url = "/transcripts?name=" + name_encoded + "&pls_link=" + PLS_link_encoded
+
+                    if (intervalID !== null) {
+                        clearInterval(intervalID); // [transcripts.html] : Arrêtez l'intervalle précédent de rafraichissement des messages/ Stop the previous message-display-refresh interval
+                    }
+                    $("#transcript").empty();
+                    $("#transcript").load(transcript_url);
+                })
+                    
+            } else {
+                console.error("Invalid coordinates for:", name, "Lat:", lat, "Lng:", lng);
+            }
+        });
+
+        function reverseMarkerBolditude(marker) {
+            const iconMap = {
+                [blueIcon.options.iconUrl]: blueBoldIcon,
+                [blueBoldIcon.options.iconUrl]: blueIcon,
+                [redIcon.options.iconUrl]: redBoldIcon,
+                [redBoldIcon.options.iconUrl]: redIcon
+            };
+
+            // Obtenir l'URL de l'icône actuelle / Get the URL of the current icon
+            const currentIconUrl = marker.options.icon.options.iconUrl;
+            
+            // Définir la nouvelle icône en utilisant l'URL actuelle pour trouver la correspondance / Set the new icon using the current URL to find the match
+            marker.setIcon(iconMap[currentIconUrl]);
+        }
+
+        // Fonction pour gérer les clics sur les marqueurs / Function to handle marker clicks
+        function onMarkerClick(e) {
+            if (selectedMarker) {
+                reverseMarkerBolditude(selectedMarker)
+            }
+            selectedMarker = e.target;
+            reverseMarkerBolditude(selectedMarker)
+        }
+
+    </script>
+    
+</body>
+</html>

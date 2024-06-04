@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Media Player</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/mediaelement/4.2.16/mediaelementplayer.min.css">
+    <style>
+        html, body {
+            height: 100%; 
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden; /* Empêche le débordement de contenu */
+        }
+        #media_player {
+            display: flex;
+            height: 5vh;
+            background-color: black;
+            color: white;
+            align-items: center;
+        }
+        #progress_container {
+            width: 33%;
+            padding-left: 20px; /* Espacement pour aligner la barre de progression à gauche */
+        }
+        #media_text {
+            width: 33%;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Centrage du texte */
+        }
+
+        #media_text {
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px; /* Espacement pour aligner le texte à droite */
+        }
+        #media_content {
+            width: 33%;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 20px; /* Espacement pour aligner le lecteur à droite */
+        }
+        audio {
+            max-width: 90%; /* Limite la largeur du lecteur audio */
+            max-height: 90%;
+        }
+        #progress {
+            width: 100%;
+            height: 2px;
+            background-color: #ccc;
+            position: relative;
+            overflow: hidden;
+        }
+        #progress_bar {
+            height: 2px;
+            background-color: red;
+            width: 0%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div id="media_player">
+        <div id="media_text">
+            <b>{{ airport_name }}</b>
+        </div>
+        <div id="media_content">
+            <audio id="player" controls preload="none" src="{{ pls_link }}" autoplay></audio>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mediaelement/4.2.16/mediaelement-and-player.min.js"></script>
+    <script>
+        var player = new MediaElementPlayer('player', {
+            success: function(media) {
+                media.addEventListener('timeupdate', function() {
+                    var percent = media.currentTime / media.duration * 100;
+                    document.getElementById('progress_bar').style.width = percent + '%';
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>

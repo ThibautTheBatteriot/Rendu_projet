@@ -1,0 +1,6 @@
+user,timestamp,text
+Alice,2024-05-14 10:00,"Bonjour, comment ça va ?"
+Bob,2024-05-14 10:01,"Salut Alice, je vais bien et toi ?"
+"Alice","2024-05-14 10:02","Je vais bien aussi, merci !"
+"Bob","2024-05-14 10:05","Prêt pour la réunion de demain ?"
+"Alice","2024-05-14 10:07","Tout est prêt, à demain !"
